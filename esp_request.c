@@ -41,7 +41,34 @@ static int resolve_dns(const char *host, struct sockaddr_in *ip) {
 
 static char *http_auth_basic_encode(const char *username, const char *password)
 {
-    return NULL;
+	// Format the token as username:password
+	size_t token_formatted_len = strlen(username) + 1 + strlen(password) + 1;
+	char token_formatted[token_formatted_len];
+	snprintf(token_formatted, token_formatted_len, "%s:%s", username, password);
+
+	// Encode the formatted token to base64
+	size_t token_encoded_len = 0;
+	mbedtls_base64_encode(NULL,
+			0,
+			&token_encoded_len,
+			(unsigned char*) token_formatted,
+			strlen(token_formatted));
+	char token_encoded[token_encoded_len];
+	mbedtls_base64_encode((unsigned char*) token_encoded,
+			token_encoded_len,
+			&token_encoded_len,
+			(unsigned char*) token_formatted,
+			strlen(token_formatted));
+	token_encoded[token_encoded_len] = 0;
+
+	// Format the header with the base64 encoded token
+	char* header_prefix = "Authorization: Basic ";
+	size_t header_len = strlen(header_prefix) + strlen(token_encoded) + 1;
+	char header[header_len];
+	snprintf(header, header_len, "%s%s", header_prefix, token_encoded);
+
+	// Return a duplicated version so the caller can free it
+    return strdup(header);
 }
 
 
