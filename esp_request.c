@@ -122,9 +122,12 @@ static int ssl_connect(request_t *req)
     nossl_connect(req);
     REQ_CHECK(req->socket < 0, "socket failed", return -1);
 
-    //TODO: Check
     req->ctx = SSL_CTX_new(TLSv1_1_client_method());
+    REQ_CHECK(req->ctx == NULL, "SSL_CTX_new NULL", return -1);
+
     req->ssl = SSL_new(req->ctx);
+    REQ_CHECK(req->ssl == NULL, "SSL_new NULL", return -1);
+
     SSL_set_fd(req->ssl, req->socket);
     SSL_connect(req->ssl);
     return 0;
@@ -252,10 +255,14 @@ static int nossl_read(request_t *req, char *buffer, int len)
 }
 static int ssl_close(request_t *req)
 {
-    SSL_shutdown(req->ssl);
-    SSL_free(req->ssl);
+    if (req->ssl) {
+        SSL_shutdown(req->ssl);
+        SSL_free(req->ssl);
+    }
     close(req->socket);
-    SSL_CTX_free(req->ctx);
+    if (req->ctx) {
+        SSL_CTX_free(req->ctx);
+    }
     return 0;
 }
 
