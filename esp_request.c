@@ -380,7 +380,7 @@ request_t *req_new(const char *uri)
 void req_setopt(request_t *req, REQ_OPTS opt, void* data)
 {
     int post_len;
-    char len_str[10] = {0};
+    char len_str[20] = {0};
     req_list_t *tmp;
     char *host_w_port = malloc(1024);
     if(!req || !data)
