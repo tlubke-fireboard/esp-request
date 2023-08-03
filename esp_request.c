@@ -122,7 +122,7 @@ static int ssl_connect(request_t *req)
     nossl_connect(req);
     REQ_CHECK(req->socket < 0, "socket failed", return -1);
 
-    req->ctx = SSL_CTX_new(TLSv1_1_client_method());
+    req->ctx = SSL_CTX_new(TLSv1_2_client_method());
     REQ_CHECK(req->ctx == NULL, "SSL_CTX_new NULL", return -1);
 
     req->ssl = SSL_new(req->ctx);
